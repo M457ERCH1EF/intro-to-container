@@ -51,9 +51,35 @@ After downloaded and installed Multipass, run the folowing command to create ubu
 $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install build-essential -y
 ```
-## Step 2: Install, Create & Configure Docker Container in Ubuntu instance
 
-### Step 2.1: Install Docker in ubuntu-01
+## Step 2: Configure Ubuntu instance - Nginx Server
+
+### Step 2.1: Install NGINX web server
+```
+$ sudo apt install nginx
+```
+
+*  to check NGINX service status
+```
+$ sudo systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2020-10-27 17:49:22 +08; 1min 38s ago
+       Docs: man:nginx(8)
+   Main PID: 16279 (nginx)
+      Tasks: 2 (limit: 3551)
+     Memory: 3.7M
+     CGroup: /system.slice/nginx.service
+             ├─16279 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+             └─16280 nginx: worker process
+
+Oct 27 17:49:22 ubuntu-01 systemd[1]: Starting A high performance web server and a reverse proxy server...
+Oct 27 17:49:22 ubuntu-01 systemd[1]: Started A high performance web server and a reverse proxy server.
+```
+
+## Step 3: Install, Create & Configure Docker Container in Ubuntu instance
+
+### Step 3.1: Install Docker in ubuntu-01
 *  install curl
 ```
 $ sudo apt install curl
@@ -106,7 +132,7 @@ TriggeredBy: ● docker.socket
  ...
 ```
 
-### Step 2.2: Create & Configure Docker in ubuntu-01
+### Step 3.2: Create & Configure Docker in ubuntu-01
 
 *  To create ubuntu docker container that does not exit when launch named **ubuntu-app** with **2GB Memory**
 ```
@@ -125,36 +151,6 @@ $ docker exec -it ubuntu-app /bin/bash
 $ apt-get update && apt-get upgrade -y
 $ apt-get install build-essential -y
 $ apt-get install curl nano
-```
-## Step 3: Configure Docker Container - Nodejs, NPM
-
-### Step 3.1: Install Node.js in Docker container = **ubuntu-app**
-
-*  To install Node.js v12.x:
-```
-$ curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
-
-$ bash nodesource_setup.sh
-
-$ apt install nodejs
-
-$ node -v
-v12.19.0
-
-$ npm -v
-6.14.8
-
-$ exit
-```
-
-### Step 3.2: Install git in Docker container = **ubuntu-app**
-
-*  To install git
-```
-$ apt install git
-
-$ git --version
-git version 2.25.1
 ```
 
 ## Step 4: Create new Docker image
@@ -180,17 +176,60 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 87f809e6c0b1        ubuntu-node         "bash -c 'shuf -i 1-…"   3 seconds ago       Up 3 seconds        0.0.0.0:3000->3000/tcp   nuxtapp
 ```
 
-## Step 5: Install Web app
-### Step 5.1: Clone the web app from GitHub
+## Step 5: Configure NGINX in Ubuntu instance
+At **ubuntu-01** instance, execute the following steps
+% 
 
-*  Access to the new Docker container = **nuxtapp**
+### Step 5.1: Get Docker container IP Address
+*  To get nuxtapp docker container IP address
 ```
-$ docker exec -it nuxtapp /bin/bash
+$ docker inspect nuxtapp
+...
+    "Gateway": "172.17.0.1",
+    "IPAddress": "172.17.0.3",
+    "IPPrefixLen": 16,
+...
 ```
-*  Clone the web app from GitHub repository
+The IP Address is **172.17.0.3**
+
+
+### Step 5.2: Configure NGINX location directives
+Using the location directive to **HTTP proxy** nuxt app, so from host we can call **http://localhost/portal** 
+*  Edit file default in /etc/nginx/sites-enabled/
 ```
-$ git clone 
-$ cd /home
-$ mkdir project
-$ cd project
+$ cd /etc/nginx/sites-enabled/
+$ sudo nano default
+```
+*  In default file, add the following new location directive = /portal
+```
+...
+location /portal {
+	proxy_http_version 1.1;
+        proxy_pass http://172.17.0.3:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+	}
+...
+
+Ctrl-o and press enter to save the file
+Ctrl-x to exit
+```
+*  Verify NGINX configuration
+```
+$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+*  restart NGINX
+```
+$ sudo systemctl restart nginx
+```
+*  check NGINX service status
+```
+$ sudo systemctl status nginx
 ```
