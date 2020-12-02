@@ -34,7 +34,7 @@ For **Windows** please enable **Hyper-V**,
 
 After downloaded and installed Multipass, run the folowing command to create ubuntu instance on your workstation.
 
-Note: For Windows, please restart 
+Note: For Windows user, please restart the machine first
 
 ***For Windows users, use Windows Powershell (admin) to run below commands #Right Click Start***
 
