@@ -12,6 +12,16 @@ Installation steps to learn, install, configure docker images and container
 8. [Run web app in Docker container](#step-8-run-web-app-in-docker-container)
 9. [Test Nuxt App from host](#step-9-test-web-app-from-host)
 
+Note:
+For **Windows** please enable **Hyper-V**,
+
+1. Right click on the Windows button and select ‘Apps and Features’.
+2. Select Programs and Features on the right under related settings.
+3. Select Turn Windows Features on or off.
+4. Select Hyper-V and click OK.
+
+<img src="https://github.com/M457ERCH1EF/intro-to-container/blob/main/hyperv-settings.png">
+
 
 ## Step 1: Create Ubuntu instance using Multipass
 
@@ -22,7 +32,9 @@ Installation steps to learn, install, configure docker images and container
 
 ### Step 1.1: Download and install multipass - https://multipass.run/
 
-After downloaded and installed Multipass, run the folowing command to create ubuntu instance on your workstation
+After downloaded and installed Multipass, run the folowing command to create ubuntu instance on your workstation.
+
+Note: For Windows, please restart 
 
 ***For Windows users, use Windows Powershell (admin) to run below commands #Right Click Start***
 
