@@ -2,16 +2,16 @@
 Installation steps to enable multi JAMStack apps using Ubuntu, Multipass, Nginx, PM2, Nuxt
 
 ## Steps:
-1. [Create Ubuntu instance using Multipass](#step-1-create-ubuntu-instance-using-multipass)
-2. [Configure Ubuntu instance - Firewall & Nginx](#step-2-configure-ubuntu-instance-firewall-nginx)
-3. [Install, Create & Configure Docker Container in Ubuntu instance](#step-3-install-create-configure-docker-container-in-ubuntu-instance)
-4. [Configure Docker Container - Nodejs, NPM](#step-4-configure-docker-container-nodejs-npm)
-5. [Create new Docker image](#step-5-create-new-docker-image)
-6. [Create Nuxt App in Docker Container](#step-6-create-nuxt-app-in-docker-container)
-7. [Configure NGINX in Ubuntu instance](#step-7-configure-nginx-in-ubuntu-instance)
-8. [Configure Nuxt app in Docker container](#step-8-configure-nuxt-app-in-docker-container)
-9. [Test Nuxt App from host](#step-9-test-nuxt-app-from-host)
-10.  [Install, Configure and Run PM2 in Docker container](#step-10-install-configure-and-run-pm2-in-docker-container)
+1. [Create Ubuntu instance using Multipass]
+2. [Configure Ubuntu instance - Firewall & Nginx]
+3. [Install, Create & Configure Docker Container in Ubuntu instance]
+4. [Configure Docker Container - Nodejs, NPM]
+5. [Create new Docker image]
+6. [Clone Web App in Docker Container from GitHub]
+7. [Configure NGINX in Ubuntu instance]
+8. [Configure Nuxt app in Docker container]
+9. [Test Nuxt App from host]
+10.  [Install, Configure and Run PM2 in Docker container]
 
 
 ## Step 1: Create Ubuntu instance using Multipass
@@ -52,7 +52,7 @@ $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install build-essential -y
 ```
 
-## Step 2: Configure Ubuntu instance - Nginx Server
+## Step 2: Configure Ubuntu instance - Nginx
 
 ### Step 2.1: Install NGINX web server
 ```
@@ -134,9 +134,9 @@ TriggeredBy: ● docker.socket
 
 ### Step 3.2: Create & Configure Docker in ubuntu-01
 
-*  To create ubuntu docker container that does not exit when launch named **ubuntu-app** with **2GB Memory**
+*  To create ubuntu docker container that does not exit when launch named **ubuntu-app** with **1GB Memory**
 ```
-$ docker run -d --memory="2g" --name ubuntu-app  ubuntu  bash -c "shuf -i 1-10000 -n 1 -o /data.txt && tail -f /dev/null"
+$ docker run -d --memory="1g" --name ubuntu-app  ubuntu  bash -c "shuf -i 1-10000 -n 1 -o /data.txt && tail -f /dev/null"
 
 $ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -150,13 +150,36 @@ $ docker exec -it ubuntu-app /bin/bash
 ```
 $ apt-get update && apt-get upgrade -y
 $ apt-get install build-essential -y
-$ apt-get install curl nano
+```
+* Install Curl, Nano and Git components
+```
+$ apt-get install curl nano git
+```
+## Step 4: Configure Docker Container - Nodejs, NPM
+
+### Step 4.1: Install Node.js in Docker container = **ubuntu-app**
+
+*  To install Node.js v12.x:
+```
+$ curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+
+$ bash nodesource_setup.sh
+
+$ apt install nodejs
+
+$ node -v
+v12.19.0
+
+$ npm -v
+6.14.8
+
+$ exit
 ```
 
-## Step 4: Create new Docker image
+## Step 5: Create new Docker image
 This step will create a **new Docker image** based on the updated Docker container = ubuntu-app which include **Firewall, NGINX, Node.js and NPM**
 
-### Step 4.1: Commit Docker container
+### Step 5.1: Commit Docker container
 At **ubuntu-01** commit the existing docker container = **ubuntu-app** to new docker image = **ubuntu-node**
 ```
 $ docker commit ubuntu-app ubuntu-node
@@ -166,7 +189,7 @@ REPOSITORY          TAG                 IMAGE ID            CREATED             
 ubuntu-node         latest              f67e1466afcc        3 seconds ago       441MB
 ubuntu              latest              d70eaf7277ea        3 days ago          72.9MB
 ```
-### Step 4.2: Create new Docker container
+### Step 5.2: Create new Docker container
 At **ubuntu-01** create new container named **nuxtapp** from docker image **ubuntu-node** that exposes port **3000**
 ```
 $ docker run -p 3000:3000 -td --name nuxtapp ubuntu-node
@@ -176,11 +199,53 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 87f809e6c0b1        ubuntu-node         "bash -c 'shuf -i 1-…"   3 seconds ago       Up 3 seconds        0.0.0.0:3000->3000/tcp   nuxtapp
 ```
 
-## Step 5: Configure NGINX in Ubuntu instance
+## Step 6: Install & Configure web app 
+### Step 6.1: Clone Web App from GitHub repository
+
+*  Access to the new Docker container = **nuxtapp**
+```
+$ docker exec -it nuxtapp /bin/bash
+or
+$ docker exec -it nuxtapp bash
+```
+*  clone web app with git
+```
+$ cd /home
+$ git clone https://github.com/M457ERCH1EF/container-app.git
+```
+* Go to web app folder
+```
+$ cd container-app
+```
+*  Install web app
+```
+$ npm install
+```
+* Run the app
+```
+$ npm run dev
+...
+   ╭───────────────────────────────────────╮
+   │                                       │
+   │   Nuxt.js @ v2.14.7                   │
+   │                                       │
+   │   ▸ Environment: development          │
+   │   ▸ Rendering:   client-side          │
+   │   ▸ Target:      server               │
+   │                                       │
+   │   Listening: http://localhost:3000/   │
+   │                                       │
+   ╰───────────────────────────────────────╯
+...
+Ctrl-c to stop the app
+$ exit
+```
+
+## Step 7: Configure NGINX in Ubuntu instance
 At **ubuntu-01** instance, execute the following steps
 % 
 
-### Step 5.1: Get Docker container IP Address
+### Step 7.1: Get Docker container IP Address
 *  To get nuxtapp docker container IP address
 ```
 $ docker inspect nuxtapp
@@ -193,7 +258,7 @@ $ docker inspect nuxtapp
 The IP Address is **172.17.0.3**
 
 
-### Step 5.2: Configure NGINX location directives
+### Step 7.2: Configure NGINX location directives
 Using the location directive to **HTTP proxy** nuxt app, so from host we can call **http://localhost/portal** 
 *  Edit file default in /etc/nginx/sites-enabled/
 ```
@@ -233,3 +298,65 @@ $ sudo systemctl restart nginx
 ```
 $ sudo systemctl status nginx
 ```
+
+## Step 8: Configure Nuxt app in Docker container
+### Step 8.1: Edit nuxt.config.js
+*  Access to the new Docker container = **nuxtapp**
+```
+$ docker exec -it nuxtapp /bin/bash
+```
+*  Goto project folder
+```
+$ cd /home/project/myapp
+```
+*  Edit **nuxt.config.js** file
+```
+$ nano nuxt.config.js
+```
+*  Add the following script
+```
+...
+server: { 
+    port: 3000, // default: 3000
+    host: '0.0.0.0' // default: localhost
+},
+router: {
+    base: '/portal/'  //to enable www.domain.com/portal
+},
+...
+
+Ctrl-o and press enter to save the file
+Ctrl-x to exit
+```
+*  Run the app
+```
+$ npm run dev
+...
+   ╭───────────────────────────────────────────────╮
+   │                                               │
+   │   Nuxt.js @ v2.14.7                           │
+   │                                               │
+   │   ▸ Environment: development                  │
+   │   ▸ Rendering:   client-side                  │
+   │   ▸ Target:      server                       │
+   │                                               │
+   │   Listening: http://172.17.0.3:3000/portal/   │
+   │                                               │
+   ╰───────────────────────────────────────────────╯
+...
+```
+
+## Step 9: Test Nuxt App from host
+### Step 9.1: Get Ubuntu instance IP Address
+*  Open new terminal at host, and run the following command
+```
+$ multipass list
+Name                    State             IPv4             Image
+ubuntu-01               Running           192.168.64.3     Ubuntu 20.04 LTS
+```
+The **ubuntu-01** IP Address is **192.168.64.3**
+
+### Step 9.2: Access nuxt app from browser
+*  Open browser - http://192.168.64.3
+
+*  Open browser - http://192.168.64.3/portal
