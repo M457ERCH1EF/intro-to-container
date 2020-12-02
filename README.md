@@ -3,7 +3,7 @@ Installation steps to enable multi JAMStack apps using Ubuntu, Multipass, Nginx,
 
 ## Steps:
 1. [Create Ubuntu instance using Multipass](#step-1-create-ubuntu-instance-using-multipass)
-2. [Configure Ubuntu instance - Firewall & Nginx]
+2. [Configure Ubuntu instance - Firewall & Nginx](#step-2-configure-ubuntu-instance---nginx)
 3. [Install, Create & Configure Docker Container in Ubuntu instance]
 4. [Configure Docker Container - Nodejs, NPM]
 5. [Create new Docker image]
