@@ -9,7 +9,7 @@ Installation steps to enable multi JAMStack apps using Ubuntu, Multipass, Nginx,
 5. [Create new Docker image](#step-5-create-new-docker-image)
 6. [Install & Configure Web App](#step-6-install--configure-web-app)
 7. [Configure NGINX in Ubuntu instance](#step-7-configure-nginx-in-ubuntu-instance)
-8. [Configure Nuxt app in Docker container]
+8. [Configure web app in Docker container](#step-8-configure-nuxt-app-in-docker-container)
 9. [Test Nuxt App from host]
 
 
@@ -298,35 +298,8 @@ $ sudo systemctl restart nginx
 $ sudo systemctl status nginx
 ```
 
-## Step 8: Configure Nuxt app in Docker container
-### Step 8.1: Edit nuxt.config.js
-*  Access to the new Docker container = **nuxtapp**
-```
-$ docker exec -it nuxtapp /bin/bash
-```
-*  Goto project folder
-```
-$ cd /home/project/myapp
-```
-*  Edit **nuxt.config.js** file
-```
-$ nano nuxt.config.js
-```
-*  Add the following script
-```
-...
-server: { 
-    port: 3000, // default: 3000
-    host: '0.0.0.0' // default: localhost
-},
-router: {
-    base: '/portal/'  //to enable www.domain.com/portal
-},
-...
+## Step 8: Run web app in Docker container
 
-Ctrl-o and press enter to save the file
-Ctrl-x to exit
-```
 *  Run the app
 ```
 $ npm run dev
@@ -345,7 +318,7 @@ $ npm run dev
 ...
 ```
 
-## Step 9: Test Nuxt App from host
+## Step 9: Test web App from host
 ### Step 9.1: Get Ubuntu instance IP Address
 *  Open new terminal at host, and run the following command
 ```
