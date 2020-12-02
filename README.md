@@ -1,5 +1,5 @@
-# JAMStack App Deployment
-Installation steps to enable multi JAMStack apps using Ubuntu, Multipass, Nginx, PM2, Nuxt
+# Docker container
+Installation steps to learn, install, configure docker images and container
 
 ## Steps:
 1. [Create Ubuntu instance using Multipass](#step-1-create-ubuntu-instance-using-multipass)
@@ -28,20 +28,20 @@ After downloaded and installed Multipass, run the folowing command to create ubu
 
 *  to check multipass version
 ```
-% multipass version
+$ multipass version
 ```
 *  to create and launch Ubuntu instance named **ubuntu-01** with **5GB storage** and **2GB memory**
 ```
-% multipass launch --disk 5G --mem 2G --name ubuntu-01
+$ multipass launch --disk 5G --mem 2G --name ubuntu-01
 
 ```
 *  to list running ubuntu
 ```
-% multipass list
+$ multipass list
 ```
 *  to access ubuntu instance
 ```
-% multipass shell ubuntu-01
+$ multipass shell ubuntu-01
 ```
 
 *  once inside ubuntu-01 instance, you should use **sudo** to run command.
@@ -98,7 +98,7 @@ logout
 ```
 *  From ***host*** access to ubuntu-01 instance again
 ```
-% multipass shell ubuntu-01
+$ multipass shell ubuntu-01
 ```
 *  list and check docker version
 ```
@@ -242,7 +242,6 @@ $ exit
 
 ## Step 7: Configure NGINX in Ubuntu instance
 At **ubuntu-01** instance, execute the following steps
-% 
 
 ### Step 7.1: Get Docker container IP Address
 *  To get nuxtapp docker container IP address
@@ -258,7 +257,7 @@ The IP Address is **172.17.0.3**
 
 
 ### Step 7.2: Configure NGINX location directives
-Using the location directive to **HTTP proxy** nuxt app, so from host we can call **http://localhost/portal** 
+Using the location directive to **HTTP proxy** web app, so from host we can call **http://172.17.0.3/portal** 
 *  Edit file default in /etc/nginx/sites-enabled/
 ```
 $ cd /etc/nginx/sites-enabled/
@@ -300,6 +299,10 @@ $ sudo systemctl status nginx
 
 ## Step 8: Run web app in Docker container
 
+*  Access to the new Docker container = **nuxtapp**
+```
+$ docker exec -it nuxtapp /bin/bash
+```
 *  Run the app
 ```
 $ npm run dev
