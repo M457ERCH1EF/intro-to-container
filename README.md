@@ -176,7 +176,7 @@ $ exit
 ```
 
 ## Step 5: Create new Docker image
-This step will create a **new Docker image** based on the updated Docker container = ubuntu-app which include **Firewall, NGINX, Node.js and NPM**
+This step will create a **new Docker image** based on the updated Docker container = ubuntu-app which include **NGINX, Node.js and NPM**
 
 ### Step 5.1: Commit Docker container
 At **ubuntu-01** commit the existing docker container = **ubuntu-app** to new docker image = **ubuntu-node**
