@@ -3,12 +3,12 @@ Installation steps to enable multi JAMStack apps using Ubuntu, Multipass, Nginx,
 
 ## Steps:
 1. [Create Ubuntu instance using Multipass](#step-1-create-ubuntu-instance-using-multipass)
-2. [Configure Ubuntu instance - Nginx](#step-2-configure-ubuntu-instance---nginx)
+2. [Configure Ubuntu instance - Nginx Proxy](#step-2-configure-ubuntu-instance---nginx)
 3. [Install, Create & Configure Docker Container in Ubuntu instance](#step-3-install-create--configure-docker-container-in-ubuntu-instance)
 4. [Configure Docker Container - Nodejs, NPM](#step-4-configure-docker-container---nodejs-npm)
 5. [Create new Docker image](#step-5-create-new-docker-image)
 6. [Install & Configure Web App](#step-6-install--configure-web-app)
-7. [Configure NGINX in Ubuntu instance]
+7. [Configure NGINX in Ubuntu instance](#step-7-configure-nginx-in-ubuntu-instance)
 8. [Configure Nuxt app in Docker container]
 9. [Test Nuxt App from host]
 
